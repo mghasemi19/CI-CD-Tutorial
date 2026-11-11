@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple Docker RAG</title>
+  <style>
+    :root{font-family:system-ui,Segoe UI,sans-serif;background:#0c1424;color:#eaf2ff}
+    *{box-sizing:border-box}body{margin:0}main{max-width:760px;margin:7vh auto;padding:24px}
+    h1{margin-bottom:4px}p{color:#aebed4;line-height:1.55}
+    .box{background:#152238;border:1px solid #304763;border-radius:14px;padding:22px;margin-top:20px}
+    textarea{width:100%;resize:vertical;min-height:90px;background:#0d182a;color:#fff;border:1px solid #4e6887;border-radius:8px;padding:12px;font:inherit}
+    button{background:#5ed1c7;color:#091521;border:0;padding:11px 20px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+    button:disabled{opacity:.5;cursor:not-allowed}pre{white-space:pre-wrap;font:inherit;line-height:1.6}
+    .small{font-size:.9rem;color:#aebed4}.answer{border-left:3px solid #5ed1c7;padding-left:15px}
+  </style>
+</head>
+<body><main>
+  <h1>Simple Docker RAG</h1>
+  <p>Three services: <b>FastAPI RAG</b> + <b>SentenceTransformers embeddings</b> + <b>ChromaDB</b>.</p>
+  <div class="box">
+    <p class="small" id="stats">Checking knowledge base...</p>
+    <label for="q">Ask about the tutorial documents</label>
+    <textarea id="q" placeholder="What is Docker Compose?"></textarea>
+    <button id="send">Ask my documents</button>
+  </div>
+  <div id="result" class="box" hidden aria-live="polite">
+    <strong>Answer</strong><pre class="answer" id="answer"></pre>
+    <div class="small" id="sources"></div>
+  </div>
+  <p class="small">This is a learning project, not a production-ready public chatbot. API keys remain on the server.</p>
+</main>
+<script>
+const q=document.getElementById('q'),send=document.getElementById('send');
+const result=document.getElementById('result'),answer=document.getElementById('answer'),sources=document.getElementById('sources');
+fetch('/stats').then(r=>r.json()).then(d=>document.getElementById('stats').textContent=`ChromaDB currently contains ${d.documents} chunks.`).catch(()=>document.getElementById('stats').textContent='Could not connect to ChromaDB.');
+send.onclick=async()=>{
+  const question=q.value.trim();if(!question)return;
+  send.disabled=true; result.hidden=false;answer.textContent='Thinking...';sources.textContent='';
+  try{
+    const r=await fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});
+    const data=await r.json();
+    if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:`HTTP ${r.status}`);
+    answer.textContent=data.answer;
+    sources.textContent=`Source files: ${data.sources.join(', ') || 'none'} · Retrieved chunks: ${data.matches}`;
+  }catch(e){answer.textContent=`Error: ${e.message}`;}
+  finally{send.disabled=false;}
+};
+</script>
+</body></html>

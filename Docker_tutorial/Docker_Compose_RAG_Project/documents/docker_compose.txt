@@ -1,0 +1,7 @@
+Docker Compose manages multiple services using a compose.yaml file. A service usually runs as a separate container. The command docker compose up --build -d builds necessary images and starts services in the background.
+
+Compose creates a default network for its services. Containers can contact one another by service name. For example a RAG application can reach the embeddings service at http://embeddings:8001 and the Chroma vector database using the hostname chroma and port 8000.
+
+A ports entry such as 127.0.0.1:8501:8000 maps a host port 8501 to the container port 8000 and restricts the published address to the local machine. The depends_on option controls startup ordering and can wait for service health checks.
+
+Docker named volumes preserve data when containers are recreated. The command docker compose down normally preserves named volumes, whereas docker compose down -v also removes declared named volumes and their stored data.

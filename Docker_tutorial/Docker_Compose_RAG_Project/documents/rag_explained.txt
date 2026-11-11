@@ -1,0 +1,7 @@
+Retrieval-Augmented Generation (RAG) combines retrieval from a document collection with answer generation by a large language model. A typical pipeline has three stages: ingest documents, retrieve relevant chunks, and generate an answer using those chunks as context.
+
+A sentence-transformer embedding model maps text into numerical vectors. The all-MiniLM-L6-v2 model normally returns 384-dimensional embeddings. Similar meaning often produces vectors that are close in embedding space.
+
+ChromaDB stores vectors alongside documents and metadata. When a user asks a question, the application embeds the question using the SAME model used during ingestion, searches the database using vector similarity, and provides the retrieved passages to the LLM.
+
+In this tutorial the LLM is called through an OpenAI-compatible Chat Completions API. The API key, base URL, and model identifier are loaded at runtime from the .env file. The model does not run inside the Docker container.

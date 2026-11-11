@@ -1,0 +1,5 @@
+Docker is a platform for packaging and running applications in containers. A Docker image contains application files, dependencies, and startup instructions. A container is a running or stopped instance of an image.
+
+A Dockerfile defines how to build an image. The FROM instruction chooses a base image. RUN executes build commands. COPY copies files into the image. CMD specifies the default startup command for a container.
+
+Docker build caching avoids repeating unchanged build steps. For Python applications, it helps to copy requirements.txt and install dependencies before copying application source code.
